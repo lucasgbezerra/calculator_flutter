@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.topLeft,
                     child: Text(
-                      equation,
+                      formattedEquation(equation),
                       style: GoogleFonts.montserrat(
                         fontSize: 18,
                       ),
@@ -103,6 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       setState(() {
                         answer = "";
+                        equation = "";
                       });
                     },
                   );
@@ -119,14 +120,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           answer = "100";
                         });
                       } else if (buttons[index] == 'backspace') {
-                        equation = equation.substring(equation.length - 2);
+                        equation = equation.substring(0, equation.length - 1);
                         setState(() {});
                       } else {
-                        setState(() {
-                          equation += " ${buttons[index]} ";
-                        });
+                        if (!operators.containsKey(equation[equation.length-1])) {
+                          setState(() {
+                            equation += buttons[index];
+                          });
+                        }
                       }
-
                     },
                   );
                   // Numeros e ponto
@@ -149,5 +151,19 @@ class _HomeScreenState extends State<HomeScreen> {
         )
       ]),
     );
+  }
+
+  String formattedEquation(String equation) {
+    List<String> operator = ['%', '÷', 'x', '-', '+'];
+
+    String formattedEquation = "";
+    for (int c = 0; c < equation.length; c++) {
+      if (operator.contains(equation[c])) {
+        formattedEquation += " ${equation[c]} ";
+      } else {
+        formattedEquation += equation[c];
+      }
+    }
+    return formattedEquation;
   }
 }
