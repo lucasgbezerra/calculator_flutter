@@ -31,7 +31,7 @@ class ButtonWidget extends StatelessWidget {
         elevation: 4,
       ),
       child: icon != null
-          ? Icon(icon, color: textColor)
+          ? Icon(icon, color: textColor, size: 20,)
           : Text(
               text!,
               style: textStyle,
