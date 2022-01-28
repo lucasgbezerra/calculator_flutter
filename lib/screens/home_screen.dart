@@ -3,9 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String answer = "";
+  String equation = "";
   @override
   Widget build(BuildContext context) {
     final sizeScreen = MediaQuery.of(context).size;
@@ -14,37 +21,38 @@ class HomeScreen extends StatelessWidget {
       'C',
       '+/-',
       '%',
-      'div',
+      '÷',
       '7',
       '8',
       '9',
-      'times',
+      'x',
       '4',
       '5',
       '6',
-      'minus',
+      '-',
       '1',
       '2',
       '3',
-      'plus',
+      '+',
       '.',
       '0',
       'backspace',
-      'equals',
+      '=',
     ];
     final Map<String, IconData> operators = {
-      'div': FontAwesomeIcons.divide,
-      'times': FontAwesomeIcons.times,
-      'minus': FontAwesomeIcons.minus,
-      'plus': FontAwesomeIcons.plus,
+      '÷': FontAwesomeIcons.divide,
+      'x': FontAwesomeIcons.times,
+      '-': FontAwesomeIcons.minus,
+      '+': FontAwesomeIcons.plus,
       'backspace': Icons.backspace_outlined,
-      'equals': FontAwesomeIcons.equals,
+      '=': FontAwesomeIcons.equals,
     };
+
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Column(children: [
         SafeArea(
-          child: Container(
+          child: SizedBox(
               height: sizeScreen.height * 0.3,
               width: sizeScreen.width,
               child: Column(
@@ -54,7 +62,7 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.topLeft,
                     child: Text(
-                      '20 + 10',
+                      equation,
                       style: GoogleFonts.montserrat(
                         fontSize: 18,
                       ),
@@ -64,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(right: 20),
                     alignment: Alignment.bottomRight,
                     child: Text(
-                      '210',
+                      answer,
                       textAlign: TextAlign.end,
                       style: GoogleFonts.montserrat(
                         fontSize: 30,
@@ -77,7 +85,7 @@ class HomeScreen extends StatelessWidget {
         ),
         Expanded(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -87,13 +95,16 @@ class HomeScreen extends StatelessWidget {
               ),
               itemCount: buttons.length,
               itemBuilder: (context, index) {
-                print(buttons[index]);
                 // Limpar
                 if (index == 0) {
                   return ButtonWidget(
                     text: buttons[index],
-                    textColor: Color(0xFF0bbfa6),
-                    onPressed: () {},
+                    textColor: const Color(0xFF0bbfa6),
+                    onPressed: () {
+                      setState(() {
+                        answer = "";
+                      });
+                    },
                   );
                   // Operadores
                 } else if (operators.containsKey(buttons[index])) {
@@ -102,7 +113,21 @@ class HomeScreen extends StatelessWidget {
                     textColor: index != buttons.length - 2
                         ? const Color(0xFFd0666e)
                         : const Color(0xFF08090a),
-                    onPressed: () {},
+                    onPressed: () {
+                      if (buttons[index] == '=') {
+                        setState(() {
+                          answer = "100";
+                        });
+                      } else if (buttons[index] == 'backspace') {
+                        equation = equation.substring(equation.length - 2);
+                        setState(() {});
+                      } else {
+                        setState(() {
+                          equation += " ${buttons[index]} ";
+                        });
+                      }
+
+                    },
                   );
                   // Numeros e ponto
                 } else {
@@ -111,7 +136,11 @@ class HomeScreen extends StatelessWidget {
                     textColor: index < 3
                         ? const Color(0xFF0bbfa6)
                         : const Color(0xFF08090a),
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        equation += buttons[index];
+                      });
+                    },
                   );
                 }
               },
