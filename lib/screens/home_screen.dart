@@ -9,9 +9,37 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sizeScreen = MediaQuery.of(context).size;
-    final red = Color(0xFFd0666e);
-    final green = Color(0xFF0bbfa6);
 
+    final List<String> buttons = [
+      'C',
+      '+/-',
+      '%',
+      'div',
+      '7',
+      '8',
+      '9',
+      'times',
+      '4',
+      '5',
+      '6',
+      'minus',
+      '1',
+      '2',
+      '3',
+      'plus',
+      '.',
+      '0',
+      'backspace',
+      'equals',
+    ];
+    final Map<String, IconData> operators = {
+      'div': FontAwesomeIcons.divide,
+      'times': FontAwesomeIcons.times,
+      'minus': FontAwesomeIcons.minus,
+      'plus': FontAwesomeIcons.plus,
+      'backspace': Icons.backspace_outlined,
+      'equals': FontAwesomeIcons.equals,
+    };
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Column(children: [
@@ -50,106 +78,43 @@ class HomeScreen extends StatelessWidget {
         Expanded(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 10),
-            child: GridView.count(
+            child: GridView.builder(
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 4,
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
-              children: [
-                // 1 line
-                ButtonWidget(
-                  text: "C",
-                  textColor: green,
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "+/-",
-                  textColor: green,
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "%",
-                  textColor: green,
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  icon: FontAwesomeIcons.divide,
-                  textColor: red,
-                  onPressed: () {},
-                ),
-                // 2 line
-                ButtonWidget(
-                  text: "7",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "8",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "9",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  icon: FontAwesomeIcons.times,
-                  textColor: red,
-                  onPressed: () {},
-                ),
-                // 3 line
-                ButtonWidget(
-                  text: "4",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "5",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "6",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  icon: FontAwesomeIcons.minus,
-                  textColor: red,
-                  onPressed: () {},
-                ),
-                // 4 line
-                ButtonWidget(
-                  text: "1",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "2",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "3",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  icon: FontAwesomeIcons.plus,
-                  textColor: red,
-                  onPressed: () {},
-                ),
-                // 5 line
-                ButtonWidget(
-                  text: ".",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  text: "0",
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  icon: Icons.backspace_outlined,
-                  onPressed: () {},
-                ),
-                ButtonWidget(
-                  icon: FontAwesomeIcons.equals,
-                  textColor: red,
-                  onPressed: () {},
-                ),
-              ],
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+              ),
+              itemCount: buttons.length,
+              itemBuilder: (context, index) {
+                print(buttons[index]);
+                // Limpar
+                if (index == 0) {
+                  return ButtonWidget(
+                    text: buttons[index],
+                    textColor: Color(0xFF0bbfa6),
+                    onPressed: () {},
+                  );
+                  // Operadores
+                } else if (operators.containsKey(buttons[index])) {
+                  return ButtonWidget(
+                    icon: operators[buttons[index]],
+                    textColor: index != buttons.length - 2
+                        ? const Color(0xFFd0666e)
+                        : const Color(0xFF08090a),
+                    onPressed: () {},
+                  );
+                  // Numeros e ponto
+                } else {
+                  return ButtonWidget(
+                    text: buttons[index],
+                    textColor: index < 3
+                        ? const Color(0xFF0bbfa6)
+                        : const Color(0xFF08090a),
+                    onPressed: () {},
+                  );
+                }
+              },
             ),
           ),
         )

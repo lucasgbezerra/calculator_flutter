@@ -11,7 +11,7 @@ class ButtonWidget extends StatelessWidget {
       {Key? key,
       this.text,
       this.backgroundColor = const Color(0xFFbbc3c9),
-      this.textColor = const Color(0xFF08090a),
+      this.textColor,
       required this.onPressed,
       this.icon})
       : super(key: key);
