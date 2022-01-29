@@ -10,7 +10,7 @@ class ButtonWidget extends StatelessWidget {
   const ButtonWidget(
       {Key? key,
       this.text,
-      this.backgroundColor = const Color(0xFFbbc3c9),
+      this.backgroundColor,
       this.textColor,
       required this.onPressed,
       this.icon})
@@ -26,12 +26,15 @@ class ButtonWidget extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         primary: backgroundColor,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
         elevation: 4,
       ),
       child: icon != null
-          ? Icon(icon, color: textColor, size: 20,)
+          ? Icon(
+              icon,
+              color: textColor,
+              size: 20,
+            )
           : Text(
               text!,
               style: textStyle,

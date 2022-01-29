@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:calculator_flutter/widgets/button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,7 +14,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String answer = "";
   String equation = "";
-  bool _switchValue = false;
+  bool _switchTheme = false;
 
   final Map<String, IconData> operators = {
     '÷': FontAwesomeIcons.divide,
@@ -52,62 +50,64 @@ class _HomeScreenState extends State<HomeScreen> {
       '=',
     ];
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
+      backgroundColor:
+          _switchTheme ? const Color(0xFF51555f) : const Color(0xFFe4e7e8),
       body: Column(children: [
         SafeArea(
           child: SizedBox(
-              height: sizeScreen.height * 0.25,
-              width: sizeScreen.width,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.only(left: 10),
-                    alignment: Alignment.topLeft,
-                    child: Text(
-                      equation,
-                      style: GoogleFonts.montserrat(
+            height: sizeScreen.height * 0.25,
+            width: sizeScreen.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(left: 10),
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    equation,
+                    style: GoogleFonts.montserrat(
                         fontSize: 18,
-                      ),
+                        color: _switchTheme
+                            ? const Color(0xFFe4e7e8)
+                            : const Color(0xFF08090a)),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.only(right: 20),
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    answer,
+                    textAlign: TextAlign.end,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 30,
+                      fontWeight: FontWeight.w500,
+                      color: _switchTheme
+                          ? const Color(0xFFe4e7e8)
+                          : const Color(0xFF08090a),
                     ),
                   ),
-                  Container(
-                    padding: const EdgeInsets.only(right: 20),
-                    alignment: Alignment.bottomRight,
-                    child: Text(
-                      answer,
-                      textAlign: TextAlign.end,
-                      style: GoogleFonts.montserrat(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ],
-              )),
+                ),
+              ],
+            ),
+          ),
         ),
         Container(
-          padding: EdgeInsets.only(left: 5),
+          padding: const EdgeInsets.only(left: 5),
           height: sizeScreen.height * 0.05,
-          // color: Colors.red,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Switch.adaptive(
                   activeColor: Colors.transparent,
-                  value: _switchValue,
-                  
+                  value: _switchTheme,
                   onChanged: (change) {
-                    setState(() {
-                      _switchValue = change;
-                    });
+                    _switchTheme = change;
+                    setState(() {});
                   }),
               Text(
-                _switchValue ? "SWITCH TO DARK THEME" : "SWITCH TO LIGHT THEME",
+                _switchTheme ? "SWITCH TO LIGHT THEME" : "SWITCH TO DARK THEME",
                 style: GoogleFonts.montserrat(
-                  fontSize: 12,
-                  color: Colors.grey[400]
-                ),
+                    fontSize: 12, color: Colors.grey[400]),
               )
             ],
           ),
@@ -125,11 +125,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               itemCount: buttons.length,
               itemBuilder: (context, index) {
+                Color defaultTextColor = _switchTheme
+                    ? const Color(0xFFe4e7e8)
+                    : const Color(0xFF08090a);
+                Color backgroundColor = _switchTheme
+                    ? const Color(0xFF60646e)
+                    : const Color(0xFFbbc3c9);
                 // Limpar
                 if (index == 0) {
                   return ButtonWidget(
                     text: buttons[index],
                     textColor: const Color(0xFF0bbfa6),
+                    backgroundColor: backgroundColor,
                     onPressed: () {
                       setState(() {
                         answer = "";
@@ -143,13 +150,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     icon: operators[buttons[index]],
                     textColor: index != buttons.length - 2
                         ? const Color(0xFFd0666e)
-                        : const Color(0xFF08090a),
+                        : defaultTextColor,
+                    backgroundColor: backgroundColor,
                     onPressed: () {
                       if (buttons[index] == '=') {
-                        setState(() {
-                          answer = convertMathExpresion(equation);
-                          equation = answer;
-                        });
+                        if (equation.isNotEmpty) {
+                          setState(() {
+                            answer = convertMathExpresion(equation);
+                            equation = answer;
+                          });
+                        }
                       } else if (buttons[index] == 'backspace') {
                         equation = equation.substring(0, equation.length - 1);
                         setState(() {});
@@ -161,7 +171,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           equation = equation.substring(0, equation.length - 1);
                           equation += buttons[index];
                         } else {
-                          equation += buttons[index];
+                          if(equation.isEmpty && buttons[index] == '-' || equation.isNotEmpty) {
+                            equation += buttons[index];
+                          }
                         }
                         setState(() {});
                       }
@@ -171,9 +183,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 } else {
                   return ButtonWidget(
                     text: buttons[index],
-                    textColor: index < 3
-                        ? const Color(0xFF0bbfa6)
-                        : const Color(0xFF08090a),
+                    textColor:
+                        index < 3 ? const Color(0xFF0bbfa6) : defaultTextColor,
+                    backgroundColor: backgroundColor,
                     onPressed: () {
                       setState(() {
                         equation += buttons[index];
