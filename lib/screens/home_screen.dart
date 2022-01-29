@@ -16,7 +16,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String answer = "";
   String equation = "";
+  bool _switchValue = false;
+
+  final Map<String, IconData> operators = {
+    '÷': FontAwesomeIcons.divide,
+    'x': FontAwesomeIcons.times,
+    '-': FontAwesomeIcons.minus,
+    '+': FontAwesomeIcons.plus,
+    'backspace': Icons.backspace_outlined,
+    '=': FontAwesomeIcons.equals,
+  };
   @override
+  Widget build(BuildContext context) {
+    final sizeScreen = MediaQuery.of(context).size;
     final List<String> buttons = [
       'C',
       '+/-',
@@ -39,24 +51,12 @@ class _HomeScreenState extends State<HomeScreen> {
       'backspace',
       '=',
     ];
-
-    final Map<String, IconData> operators = {
-      '÷': FontAwesomeIcons.divide,
-      'x': FontAwesomeIcons.times,
-      '-': FontAwesomeIcons.minus,
-      '+': FontAwesomeIcons.plus,
-      'backspace': Icons.backspace_outlined,
-      '=': FontAwesomeIcons.equals,
-    };
-  Widget build(BuildContext context) {
-    final sizeScreen = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
       body: Column(children: [
         SafeArea(
           child: SizedBox(
-              height: sizeScreen.height * 0.3,
+              height: sizeScreen.height * 0.25,
               width: sizeScreen.width,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -86,7 +86,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               )),
         ),
+        Container(
+          padding: EdgeInsets.only(left: 5),
+          height: sizeScreen.height * 0.05,
+          // color: Colors.red,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Switch.adaptive(
+                  activeColor: Colors.transparent,
+                  value: _switchValue,
+                  
+                  onChanged: (change) {
+                    setState(() {
+                      _switchValue = change;
+                    });
+                  }),
+              Text(
+                _switchValue ? "SWITCH TO DARK THEME" : "SWITCH TO LIGHT THEME",
+                style: GoogleFonts.montserrat(
+                  fontSize: 12,
+                  color: Colors.grey[400]
+                ),
+              )
+            ],
+          ),
+        ),
         Expanded(
+          flex: 2,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: GridView.builder(
@@ -128,7 +155,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         setState(() {});
                       } else if (buttons[index] == '+/-') {
                       } else {
-                        if (equation.isNotEmpty && operators.containsKey(equation[equation.length - 1])) {
+                        if (equation.isNotEmpty &&
+                            operators
+                                .containsKey(equation[equation.length - 1])) {
                           equation = equation.substring(0, equation.length - 1);
                           equation += buttons[index];
                         } else {
@@ -162,8 +191,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String convertMathExpresion(String exp) {
     //Ultimo character é um simbolo
-    if(operators.containsKey(exp[exp.length - 1])) {
-      exp = exp.substring(0, exp.length-1);
+    if (operators.containsKey(exp[exp.length - 1])) {
+      exp = exp.substring(0, exp.length - 1);
     }
     exp = exp.replaceAll(RegExp(r"x"), "*");
     exp = exp.replaceAll(RegExp(r"÷"), "/");
