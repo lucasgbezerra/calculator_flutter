@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:calculator_flutter/widgets/button_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -14,9 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String answer = "";
   String equation = "";
   @override
-  Widget build(BuildContext context) {
-    final sizeScreen = MediaQuery.of(context).size;
-
     final List<String> buttons = [
       'C',
       '+/-',
@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'backspace',
       '=',
     ];
+
     final Map<String, IconData> operators = {
       '÷': FontAwesomeIcons.divide,
       'x': FontAwesomeIcons.times,
@@ -47,6 +48,8 @@ class _HomeScreenState extends State<HomeScreen> {
       'backspace': Icons.backspace_outlined,
       '=': FontAwesomeIcons.equals,
     };
+  Widget build(BuildContext context) {
+    final sizeScreen = MediaQuery.of(context).size;
 
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -62,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     padding: const EdgeInsets.only(left: 10),
                     alignment: Alignment.topLeft,
                     child: Text(
-                      formattedEquation(equation),
+                      equation,
                       style: GoogleFonts.montserrat(
                         fontSize: 18,
                       ),
@@ -117,17 +120,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     onPressed: () {
                       if (buttons[index] == '=') {
                         setState(() {
-                          answer = "100";
+                          answer = convertMathExpresion(equation);
+                          equation = answer;
                         });
                       } else if (buttons[index] == 'backspace') {
                         equation = equation.substring(0, equation.length - 1);
                         setState(() {});
+                      } else if (buttons[index] == '+/-') {
                       } else {
-                        if (!operators.containsKey(equation[equation.length-1])) {
-                          setState(() {
-                            equation += buttons[index];
-                          });
+                        if (equation.isNotEmpty && operators.containsKey(equation[equation.length - 1])) {
+                          equation = equation.substring(0, equation.length - 1);
+                          equation += buttons[index];
+                        } else {
+                          equation += buttons[index];
                         }
+                        setState(() {});
                       }
                     },
                   );
@@ -153,17 +160,22 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String formattedEquation(String equation) {
-    List<String> operator = ['%', '÷', 'x', '-', '+'];
-
-    String formattedEquation = "";
-    for (int c = 0; c < equation.length; c++) {
-      if (operator.contains(equation[c])) {
-        formattedEquation += " ${equation[c]} ";
-      } else {
-        formattedEquation += equation[c];
-      }
+  String convertMathExpresion(String exp) {
+    //Ultimo character é um simbolo
+    if(operators.containsKey(exp[exp.length - 1])) {
+      exp = exp.substring(0, exp.length-1);
     }
-    return formattedEquation;
+    exp = exp.replaceAll(RegExp(r"x"), "*");
+    exp = exp.replaceAll(RegExp(r"÷"), "/");
+    exp = exp.replaceAll(RegExp(r"%"), "/100");
+
+    Expression expression = Parser().parse(exp);
+
+    double eval = expression.evaluate(EvaluationType.REAL, ContextModel());
+
+    if (eval % 1 == 0) {
+      return eval.toInt().toString();
+    }
+    return eval.toString();
   }
 }
