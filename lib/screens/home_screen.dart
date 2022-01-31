@@ -157,7 +157,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (equation.isNotEmpty) {
                           setState(() {
                             answer = convertMathExpresion(equation);
-                            equation = answer;
                           });
                         }
                       } else if (buttons[index] == 'backspace') {
